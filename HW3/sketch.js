@@ -15,8 +15,8 @@ function setup(){
   var PauseButt = select("#pause_button");
   PlayButt.mousePressed(Play);
   PauseButt.mousePressed(Pause);
-  slider = createSlider(4,44,4,4)
-  fibSlider = createSlider(0,1000,100,50)
+  slider = createSlider(0,255,1)
+  fibSlider = createSlider(0,5000,500,50)
 
 
 
@@ -26,6 +26,7 @@ function draw(){
   background(200);
   translate(displayWidth/2,displayHeight/2);
   numFibs = fibSlider.value()
+
   let fibAni = new Fibonacci(fibs,fibcolors)
 
   //fibAni.color()
@@ -40,7 +41,7 @@ play = false;
 }
 
 function fibcolor(){
-for (var i=0;i<slider.value();i++){
+for (var i=0;i<44;i++){
 fibcolors[i] = color(random(255),random(255),random(255))
 }
 }
@@ -65,13 +66,13 @@ class Fibonacci{
     this.fibs = FibArray
     this.fibcolors = ColorArray
   }
-  draw(){
+  draw(sliderinput){
     setMinScale(this.fibs)
     for (var i=0;i<this.fibs.length;i++){
       const fib = fibs[i] * scale
       if (this.fibcolors.length > 0){
       const color = this.fibcolors[i%4]
-      fill(color)
+
     }
       rect(0,0,fib,fib)
       arc(fib,0,2*fib,2*fib,90,180)
