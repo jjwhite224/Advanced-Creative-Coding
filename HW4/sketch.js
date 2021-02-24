@@ -67,12 +67,14 @@ soungCounter = 0
     console.log(albumNames)
     albumCounter = 0;
     for (i=0;i<albumNames.length;i++){
+      albumCounter = 0;
       for(j=0;j<albumNames.length;j++){
-        if (albumNames[i] == albumNames[j]){
+        if (albumNames[j] == albumNames[i]){
           albumCounter += 1
-          append(albumCount,albumCounter);
+          albumCount.push(albumCounter);
+
         }
-  albumCounter = 0
+
         }
 
       }
