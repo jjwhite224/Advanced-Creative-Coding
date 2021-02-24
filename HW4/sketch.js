@@ -18,7 +18,6 @@ function setup() {
   rectMode(CENTER)
   songData();
   albumData();
-  console.log(songCount)
   console.log(albumCount)
   for(i=0;i<songNames.length;i++){
     songBubbles.push(new Bubble(songNames[i],songCount[i],colors[i]))
@@ -26,8 +25,6 @@ function setup() {
   }
   console.log(songBubbles)
   console.log(albumBubbles)
-  colorpick= colors[random(0,colors.length)]
-  console.log(colorpick)
   }
 
 function draw(){
@@ -65,18 +62,21 @@ soungCounter = 0
     albumNames = table.getColumn("What's your favorite album right now and who is it by?")
     colors = table.getColumn("What color would you say this music makes you feel?")
     console.log(albumNames)
-    albumCounter = 0;
+    albumCounter = 1;
     for (i=0;i<albumNames.length;i++){
       albumCounter = 0;
       for(j=0;j<albumNames.length;j++){
         if (albumNames[j] == albumNames[i]){
           albumCounter += 1
-          albumCount.push(albumCounter);
+
+
 
         }
 
-        }
 
+        }
+albumCount.push(albumCounter);
+albumCounter = 0;
       }
     }
 
