@@ -33,7 +33,7 @@ function draw(){
 
 background(pokecolor)
 //image(img,1200,0,100,100)
-$("h1,h2,h3,h4,h5,h6").css({"background-color": pokecolor,"text-align": "center","margin":'auto'});
+$("h1,h2,h3,h4,h5,h6").css({"background-color": pokecolor,"color":"white","text-align": "center","margin":'auto'});
 $("img").css({"width":300,"height":300});
 pokeButton.mousePressed(findPokemon);
 randpokeButton.mousePressed(findrandPokemon);
@@ -137,11 +137,11 @@ for (var i=0;i<pokeInfo.moves.length;i++){
 
 //(para4).append("Moves: " + pokeMoves[0]);
 var statlocationy = 250;
-var statlocationx = 0;
+var statlocationx = -50;
 for (i=0;i<pokeInfo.stats.length;i++){
 
 
-  statlocationx += 250;
+  statlocationx+= 200;
   statbubbles[i] = new StatBubble(pokeInfo.stats[i],statlocationx,statlocationy);
 }
 }
@@ -167,11 +167,12 @@ class StatBubble{
 
 }
 render(){
-   textSize(24)
+   textSize(18)
    textAlign(CENTER)
    textFont(pokefont)
-   text(this.name+": "+this.size,this.x,this.y-75)
-   fill('white');
+   noStroke();
+   fill("white")
+   text(this.name+":"+this.size,this.x,this.y-75)
    strokeWeight(3);
    stroke('black');
    ellipse(this.x,this.y,this.size);
