@@ -137,11 +137,11 @@ for (var i=0;i<pokeInfo.moves.length;i++){
 
 //(para4).append("Moves: " + pokeMoves[0]);
 var statlocationy = 250;
-var statlocationx = -50;
+var statlocationx = 0;
 for (i=0;i<pokeInfo.stats.length;i++){
 
 
-  statlocationx+= 200;
+  statlocationx+= width/7;
   statbubbles[i] = new StatBubble(pokeInfo.stats[i],statlocationx,statlocationy);
 }
 }
