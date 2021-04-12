@@ -6,14 +6,12 @@ var objectResults = [];
 var score = 0;
 
 function preload(){
-  // img = loadImage("images/dog-and-cat.jpg");
   detector = ml5.objectDetector("cocossd");
   mastodon=loadFont('fonts/MASTOD__.otf');
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight/2);
-  // img.resize(width, height);
   myVid = createCapture(VIDEO, videoLoaded);
   guessButton = createButton('guess')
   yesButton = createButton('yes')
@@ -31,14 +29,11 @@ function videoLoaded(){
   detector.detect(myVid, objectsIDed);
 }
 
-// callbacks on ml5 functions are error first
 function objectsIDed(error, results){
   if(error){
     console.error(error);
   } else {
-    // console.log(results);
     objectResults = results;
-    // function calling itself is called a recursive function
     detector.detect(myVid, objectsIDed);
   }
 }
@@ -64,8 +59,6 @@ function wordwrong(){
 }
 
 function draw() {
-
-  //background('yellow');
   image(myVid,0,0);
   guessButton.mousePressed(word);
   yesButton.mousePressed(wordcorrect);
