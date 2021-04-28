@@ -90,7 +90,7 @@ for( let [key, value] of Object.entries(trends)){
             }
             index++;
             // if we have completed all of the 'trends'
-            if(index == 6){
+            if(index == 50){
                 // confirm your classifier works as expected
                 var try_it = "I Love Arsenal";
                 try_it.split(" ").join(", ")
