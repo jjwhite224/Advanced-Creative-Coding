@@ -4,11 +4,12 @@ let playing = false;
 var gifvid;
 var mygif;
 var myAsciiArt;
+var gifnum = 0;
 
 /*
   The size of generated ASCII graphics expressed in characters and lines.
 */
-var asciiart_width = 640; var asciiart_height = 400;
+var asciiart_width=192; var asciiart_height=108;
 
 /*
   This table will store several example images that will be converted to the
@@ -35,26 +36,32 @@ var ascii_arr;
 var cyclic_t;
 
 /*
+
   Let's load the example images first.
 */
 
 function preload(){
-//gifs = loadJSON('https://api.giphy.com/v1/gifs/search?api_key=Y9OfF5m05o8BZJ5MAjOY9CDXg8XVcY20&q=@animatr anime &limit=25&offset=0&rating=r&lang=en',pickGif)
-gifarray[0] =
-  loadImage('../assets/animegif.gif');
+gifs = loadJSON('https://api.giphy.com/v1/gifs/search?api_key=Y9OfF5m05o8BZJ5MAjOY9CDXg8XVcY20&q= psychedelic &limit=25&offset=0&rating=r&lang=en',pickGif)
+//gifarray[0] =
+
 // "Le Penseur", Auguste Rodin, 1880
-gifarray[1] =loadImage('../assets/animegif1.gif');
+//gifarray[1] =loadImage('../assets/animegif1.gif');
 // "American Gothic", Grant DeVolson Wood, 1930
 //gifarray[2] = loadImage('../assets/animegif(2).gif');
 // "La Liseuse", Jean-Honoré Fragonard, 1770
 //gifarray[3] = loadImage('../assets/animegif(3).gif');
 }
 function setup(){
-  //console.log(gifs)
-  createCanvas(640,400);
-  //gifvid = createVideo(mygif);
+  console.log(gifs)
+  createCanvas(windowWidth,windowHeight);
+  gifvid = createVideo(mygif);
+  gifvid.hide();
   gfx = createGraphics(asciiart_width, asciiart_height);
   gfx.pixelDensity(1);
+  playButton = createButton('play')
+  playButton.mousePressed(toggleVid)
+  skipButton = createButton('skip')
+  skipButton.mousePressed(nextgif)
   /*
     Here we create an object derived from the AsciiArt pseudo-class from the
     p5.asciiart library.
@@ -76,24 +83,24 @@ function setup(){
     is using 'monospace' font, so we want to apply the same setting to our
     sketch.
   */
-  textAlign(CENTER, CENTER); textFont('monospace', 8); textStyle(NORMAL);
-  noStroke(); fill(255);
+  textAlign(CENTER, CENTER); textFont('monospace', 12); textStyle(NORMAL);
+  noStroke();
   /*
     Finally we set the framerate.
   */
-  frameRate(30);
+  frameRate(random(60));
 
 
 }
 function draw(){
   background(0);
+  gfx.background(0);
   /*
     First, let's calculate which image from the images[] array should now be
     displayed. The floor part of the calculated value will indicate the index
     of the image to be displayed. The decimal part will be used to calculate
     the tint.
   */
-  cyclic_t = millis() * 0.0002 % giffinarray.length;
   /*
     Let's prepare the image for conversion. Although the object derived from
     the AsciiArt pseudo-class has it's own mechanism of changing the size of
@@ -101,14 +108,14 @@ function draw(){
     before transferring the image for conversion - to perform the posterize
     effect on it, which will make the final effect better.
   */
-  gfx.image(gifarray[floor(cyclic_t)],0,0,width,height);
+  gfx.image(gifvid,0,0,gfx.width,gfx.height);
   /*
     It is worth experimenting with the value of the parameter defining the
     level of posterization. Depending on the characteristics of the image,
     different values may have the best effect. And sometimes it is worth not
     to apply the effect of posterization on the image.
   */
-  gfx.filter(POSTERIZE, 3);
+  gfx.filter(POSTERIZE, 5);
   /*
     Here the processed image is converted to the ASCII art. The convert()
     function in this case is used with just one parameter (image we want to
@@ -151,16 +158,16 @@ function draw(){
   /*
     Finally, let's display the source image, too.
   */
-  tint(255, pow(1.0 - (cyclic_t % 1.0), 4) * 255);
-  image(gifarray[floor(cyclic_t)]);
-  noTint();
+  //image(gifvid,0,0,width,height);
+fill(random(255),random(255),random(255));
 
 }
 function pickGif(){
     for(var i=0;i<gifs.data.length;i++){
-      gif = gifs.data[i].images.original.url
+      gif = gifs.data[i].images.looping.mp4;
       append(gifarray,gif)
     }
+
 mygifnum = floor(random(gifarray.length))
 mygif = gifarray[mygifnum]
 console.log(mygif)
@@ -169,14 +176,14 @@ console.log(mygif)
   function toggleVid() {
     if (playing) {
       gifvid.pause();
-      button.html('play');
+      playButton.html('play');
     } else {
       gifvid.loop();
-      button.html('pause');
+      playButton.html('pause');
     }
     playing = !playing;
   }
 
-  function imagecon(){
-    console.log(giffinarray)
+  function nextgif(){
+    gifnum += 1;
   }
