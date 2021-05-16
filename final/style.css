@@ -1,9 +1,15 @@
 html, body {
   margin: 0;
   padding: 0;
+  background-color: black;
 }
 
 canvas {
   text-align: center;
   display: flex;
+}
+
+input{
+  background-color: black;
+  color: white;
 }

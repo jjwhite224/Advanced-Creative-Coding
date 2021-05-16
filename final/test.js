@@ -1,15 +1,24 @@
-gifarray = [];
-giffinarray = [];
+var gifarray = [];
 let playing = false;
 var gifvid;
 var mygif;
 var myAsciiArt;
 var gifnum = 0;
-
+let timer = 30;
+var playPromise;
+var fft;
+var bass;
+var treble;
+var mid;
+var vidloaded = false;
+var audioloaded = false;
+var soundPlaying = false;
+var asciitreble=192;
+var asciibass=108;
 /*
   The size of generated ASCII graphics expressed in characters and lines.
 */
-var asciiart_width=192; var asciiart_height=108;
+var asciiart_width=asciitreble; var asciiart_height=asciibass;
 
 /*
   This table will store several example images that will be converted to the
@@ -33,35 +42,20 @@ var ascii_arr;
   A helper variable to store current "circular" time, useful in controlling of
   the cyclic image display.
 */
-var cyclic_t;
-
-/*
-
-  Let's load the example images first.
-*/
-
+//space gif search term: @salmonickatelier space @dualvoidanima space
 function preload(){
-gifs = loadJSON('https://api.giphy.com/v1/gifs/search?api_key=Y9OfF5m05o8BZJ5MAjOY9CDXg8XVcY20&q= psychedelic &limit=25&offset=0&rating=r&lang=en',pickGif)
-//gifarray[0] =
-
-// "Le Penseur", Auguste Rodin, 1880
-//gifarray[1] =loadImage('../assets/animegif1.gif');
-// "American Gothic", Grant DeVolson Wood, 1930
-//gifarray[2] = loadImage('../assets/animegif(2).gif');
-// "La Liseuse", Jean-Honoré Fragonard, 1770
-//gifarray[3] = loadImage('../assets/animegif(3).gif');
+gifs = loadJSON('https://api.giphy.com/v1/gifs/search?api_key=Y9OfF5m05o8BZJ5MAjOY9CDXg8XVcY20&q=@dualvoidanima&limit=25&offset=0&rating=r&lang=en',pickGif);
+carti = loadSound('assets/'+str(floor(random(5)))+'.mp3',soundLoaded)
 }
 function setup(){
-  console.log(gifs)
-  createCanvas(windowWidth,windowHeight);
-  gifvid = createVideo(mygif);
+  gifvid = createVideo(mygif,vidLoaded);
   gifvid.hide();
+  console.log(gifarray)
+  createCanvas(windowWidth,windowHeight);
+  fft= new p5.FFT();
+  amplitude = new p5.Amplitude();
   gfx = createGraphics(asciiart_width, asciiart_height);
   gfx.pixelDensity(1);
-  playButton = createButton('play')
-  playButton.mousePressed(toggleVid)
-  skipButton = createButton('skip')
-  skipButton.mousePressed(nextgif)
   /*
     Here we create an object derived from the AsciiArt pseudo-class from the
     p5.asciiart library.
@@ -83,18 +77,43 @@ function setup(){
     is using 'monospace' font, so we want to apply the same setting to our
     sketch.
   */
-  textAlign(CENTER, CENTER); textFont('monospace', 12); textStyle(NORMAL);
+  textAlign(CENTER, CENTER); textStyle(NORMAL);
   noStroke();
   /*
     Finally we set the framerate.
   */
-  frameRate(random(60));
+  frameRate(30);
 
 
 }
 function draw(){
-  background(0);
-  gfx.background(0);
+  colorMode(HSL,360,100,100,1)
+  fft.analyze();
+  bass = fft.getEnergy("bass");
+  treble = fft.getEnergy("treble");
+  mid = fft.getEnergy("mid");
+  amp = amplitude.getLevel();
+  //console.log(amp)
+  var bassScale = map(bass,0,255,0,1);
+  var midscale = map(mid,0,255,0,1);
+  var treblescale = map(treble,0,255,0,1);
+  var hueVar = map(treblescale,0,1,0,360);
+  var sat = map(midscale,0,1,0,100);
+  var bright = map(bassScale,0,1,10,100);
+  gifvid.playbackRate = map(amp,0,1,0,0.5);
+  //fill('hsb('+str(map(bass,0,255,0,360))+str(map(mid,0,255,0,100))+str(map(mid,0,255,0,100))+')');
+  songColor  = color(random(hueVar),random(sat),bright)
+  asciibass=map(map,0,1,0,windowHeight/10)
+  asciitreble=map(amp,0,1,0,windowWidth/10)
+  textFont('monospace', map(amp,0,1,4,20))
+  //textFont('monospace',12)
+  //console.log([bass,mid,treble,asciibass,asciitreble])
+  ampScale = map(amp,0,1,0,100)
+  ampScale360 = map(amp,0,1,0,random(360))
+  background('black');
+  //skipButton.mousePressed(nextgif)
+  //console.log(gifnum)
+  //gfx.background('purple');
   /*
     First, let's calculate which image from the images[] array should now be
     displayed. The floor part of the calculated value will indicate the index
@@ -115,7 +134,7 @@ function draw(){
     different values may have the best effect. And sometimes it is worth not
     to apply the effect of posterization on the image.
   */
-  gfx.filter(POSTERIZE, 5);
+  gfx.filter(POSTERIZE, 7);
   /*
     Here the processed image is converted to the ASCII art. The convert()
     function in this case is used with just one parameter (image we want to
@@ -159,31 +178,61 @@ function draw(){
     Finally, let's display the source image, too.
   */
   //image(gifvid,0,0,width,height);
-fill(random(255),random(255),random(255));
+  fill(hueVar,sat,bright)
+  if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+     timer --;
+   }
+   if (timer == 0) {
+     timer = 30;
+     nextgif();
+   }
 
-}
+ }
+
+
 function pickGif(){
     for(var i=0;i<gifs.data.length;i++){
       gif = gifs.data[i].images.looping.mp4;
       append(gifarray,gif)
     }
-
-mygifnum = floor(random(gifarray.length))
-mygif = gifarray[mygifnum]
-console.log(mygif)
+    mygifnum = floor(random(gifarray.length))
+    mygif = gifarray[mygifnum]
+    console.log(mygif)
 
   }
-  function toggleVid() {
-    if (playing) {
-      gifvid.pause();
-      playButton.html('play');
-    } else {
-      gifvid.loop();
-      playButton.html('pause');
+
+function playVid(){
+  if (vidloaded == true){
+   gifvid.play();
+   console.log(gifvid)
+ }
+}
+
+function playSound(){
+    if (audioloaded == true && soundPlaying == false){
+    carti.play();
+    soundPlaying = true;
     }
-    playing = !playing;
+    }
+
+  function pauseVid(){
+      gifvid.pause();
+      if (soundPlaying == true){
+      carti.pause();
+      soundPlaying = false;
+    }
   }
 
   function nextgif(){
+    clear();
     gifnum += 1;
+    gifvid.remove();
+    gifvid=createVideo(gifarray[gifnum],playVid);
+    gifvid.hide();
   }
+
+function keyPressed(){if(keyCode==32){playVid();/*playSound*/}else if(keyCode==16){pauseVid();}else if(keyCode==49){carti = loadSound('assets/1.mp3',soundLoaded);if(audioloaded == true){playSound();}}else if(keyCode==50){carti = loadSound('assets/2.mp3',soundLoaded);if(audioloaded == true){playSound();}}else if(keyCode==51){carti = loadSound('assets/3.mp3',soundLoaded);if(audioloaded == true){playSound();}}else if(keyCode==52){carti = loadSound('assets/4.mp3',soundLoaded);if(audioloaded == true){playSound();}}else if(keyCode==53){carti = loadSound('assets/5.mp3',soundLoaded);if(audioloaded == true){playSound();}}else if (keyCode == 9){nextgif();}}
+function vidLoaded(){vidloaded=true;console.log(vidloaded)}
+function soundLoaded(){audioloaded=true;console.log(audioloaded)}
+
+//function keyPressed(){if(keyCode=='Shift 16'){pauseVid()}}
